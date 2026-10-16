@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Tốc Độ Phản Xạ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .info-panel {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .settings-panel {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
+        }
+        select, .extra-btn {
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background-color: #f8f9fa;
+        }
+        .extra-btn:hover {
+            background-color: #e2e6ea;
+        }
+        #arena {
+            width: 600px;
+            height: 400px;
+            background-color: #1e1e1e;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            cursor: crosshair;
+        }
+        .target {
+            width: 40px;
+            height: 40px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 0 10px #ff4757;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            background-color: #2ed573;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #26af5f;
+        }
+        button:disabled {
+            background-color: #a4b0be;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h2>Trò Chơi Phản Xạ Click Chuột</h2>
+        
+        <div class="settings-panel">
+            <label for="timeSelect">Thời gian:</label>
+            <select id="timeSelect">
+                <option value="15">15 giây</option>
+                <option value="30" selected>30 giây</option>
+                <option value="60">60 giây</option>
+            </select>
+            <button class="extra-btn" onclick="changeArenaColor()">Đổi màu nền</button>
+            <button class="extra-btn" onclick="showPlayerInfo()">Người chơi</button>
+        </div>
+
+        <div class="info-panel">
+            <div>Điểm số: <span id="score">0</span></div>
+            <div>Thời gian: <span id="timer">30</span>s</div>
+        </div>
+
+        <div id="arena">
+            <div id="target" class="target"></div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" onclick="startGame()">Bắt đầu trò chơi</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let timerInterval = null;
+        let isPlaying = false;
+
+        const arena = document.getElementById('arena');
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const timeSelect = document.getElementById('timeSelect');
+
+        function changeArenaColor() {
+            const colors = ['#1e1e1e', '#2c3e50', '#2d3436', '#34495e', '#212529', '#3b3b98'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            arena.style.backgroundColor = randomColor;
+        }
+
+        function showPlayerInfo() {
+            alert('Họ tên: Nguyễn Duy Thiện\nMã sinh viên: 231A010579\nTrường: Đại học Văn Hiến');
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = parseInt(timeSelect.value);
+            scoreDisplay.textContent = score;
+            timerDisplay.textContent = timeLeft;
+            startBtn.disabled = true;
+            timeSelect.disabled = true;
+            isPlaying = true;
+
+            moveTarget();
+            target.style.display = 'block';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function moveTarget() {
+            const maxWidth = arena.clientWidth - target.clientWidth;
+            const maxHeight = arena.clientHeight - target.clientHeight;
+            
+            const randomX = Math.floor(Math.random() * maxWidth);
+            const randomY = Math.floor(Math.random() * maxHeight);
+
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        target.addEventListener('click', () => {
+            if (!isPlaying) return;
+            score++;
+            scoreDisplay.textContent = score;
+            moveTarget();
+        });
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            target.style.display = 'none';
+            startBtn.disabled = false;
+            timeSelect.disabled = false;
+            alert('Hết giờ! Tổng số điểm đạt được của bạn là: ' + score);
+        }
+    </script>
+
+</body>
+</html>
